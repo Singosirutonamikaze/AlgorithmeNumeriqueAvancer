@@ -1,11 +1,12 @@
 #Importation des modules necessaires
 from sympy import symbols, sympify, sin, cos, tan, log, sqrt
 import re
+import math
 
 # Fonction pour afficher un message de bienvenue avec un cadre de texte
 def rectangle_bienvenue_complexe():
     # Définir la phrase à afficher et calculer la largeur du rectangle
-    phrase = " BIENVENUE "  # Texte à afficher
+    phrase = "      BIENVENUE DANS LA RESOLUTION D'EQUATION F(x) = 0     "  # Texte à afficher
     largeur = len(phrase) + 6  # Largeur du rectangle (avec une marge de 3 caractères de chaque côté)
     hauteur = 5  # Hauteur du rectangle (fixée à 5 lignes)
 
@@ -36,9 +37,6 @@ def methode_resolution():
 # Initialisation de 'x' pour pouvoir l'utiliser comme symbole dans les expressions mathématiques
 x = symbols('x')
 
-import re
-from sympy import sympify
-
 def saisir_fonction():
     # Affichage du menu pour choisir le type de fonction
     print("\n******************* Menu de choix de fonction *******************\n")
@@ -59,10 +57,12 @@ def saisir_fonction():
         "5": "Rationnelle",
         "6": "Fonction générale"
     }
+    
+  
 
    # Dictionnaire des expressions régulières pour chaque type de fonction
     regex_patterns = { 
-        "1": r"^(sin|cos|tan|sec|csc|cot|exp|log|ln|sqrt|abs)?\([0-9xX\+\-\*/\^\(\)\s]+$", # Polynôme 
+        "1": r"^(x|sin|cos|tan|sec|csc|cot|-exp|log|ln|sqrt|abs)?\(?[0-9xX\+\-\*/\^\(\)\s]+(\*\*[0-9xXexp(1/x)\+\-\*/\^\(\)\s]*)?\)?$", # Polynôme
         "2": r"^(sin|cos|tan|sec|csc|cot|exp|log|ln|sqrt|abs)?\([xX0-9\+\-\*/\s]+\)[\+\-\*/xX0-9\(\)\s]*$",# Trigonométrique 
         "3": r"^(sin|cos|tan|exp|ln|sqrt|abs|log|)?\([xX0-9\+\-\*/\s\^\.\,\(]+\)([\+\-\*/\^xX0-9\(\)\s]*(sin|cos|tan|exp|ln|sqrt|abs|log)?\([xX0-9\+\-\*/\s\^\.\,\(]+\))*$", # Logarithmique
         "4": r"^(sqrt|cbrt|root\d*|sin|cos|tan|sec|csc|cot|exp|ln|log)?\([xX0-9\+\-\*/\s]+\)|e\*\*[xX0-9\+\-\*/\s]+[\+\-\*/xX0-9\(\)\s]*$", # Racine carrée
@@ -126,15 +126,38 @@ def saisir_tolerance_et_iterations():
         except ValueError:
             print("Erreur : veuillez entrer des valeurs numériques valides pour la tolérance (flottant) et un entier pour le nombre d'itérations.")
 
+def verifier_ensemble_de_definition(fonction, borne):
+    """Vérifie si la borne est dans l'ensemble de définition de la fonction."""
+    try:
+        # Vérification des racines carrées (si la fonction en contient)
+        if 'sqrt' in str(fonction):
+            expr_sqrt = fonction.subs(x, borne)
+            if expr_sqrt < 0:
+                print(f"Erreur : L'expression sous la racine carrée est négative pour x = {borne}.")
+                return False
 
-def demander_bornes():
+        # Vérification des dénominateurs pour les fonctions rationnelles
+        if '/' in str(fonction):
+            expr_denominateur = fonction.as_numer_denom()[1].subs(x, borne)
+            if expr_denominateur == 0:
+                print(f"Erreur : Division par zéro pour x = {borne}.")
+                return False
+
+        return True  # La borne est valide dans l'ensemble de définition
+    except Exception as e:
+        print(f"Erreur lors de la vérification du domaine : {e}")
+        return False
+
+def demander_bornes(fonction_str):
     """Demande à l'utilisateur de saisir les bornes inférieure et supérieure de l'intervalle."""
     while True:
         try:
-            # Demander la saisie des bornes de l'intervalle
-            borne_inferieure = float(input("Entrez la borne inférieure de l'intervalle : "))
-            borne_superieure = float(input("Entrez la borne supérieure de l'intervalle : "))
+            # Demander la saisie de la borne inférieure
+            borne_inferieure = demander_borne(fonction_str, "Entrez la borne inférieure de l'intervalle : ")
             
+            # Demander la saisie de la borne supérieure
+            borne_superieure = demander_borne(fonction_str, "Entrez la borne supérieure de l'intervalle : ")
+
             # Vérifier que la borne inférieure est bien inférieure à la borne supérieure
             if borne_inferieure < borne_superieure:
                 return borne_inferieure, borne_superieure
@@ -143,5 +166,17 @@ def demander_bornes():
         except ValueError:
             print("Erreur : veuillez entrer un nombre réel valide pour chaque borne.")
 
-
-
+def demander_borne(fonction_str, message):
+    """Demande à l'utilisateur de saisir une borne et vérifie si elle est dans l'ensemble de définition de la fonction."""
+    while True:
+        try:
+            # Demande à l'utilisateur de saisir une valeur
+            borne = float(input(message))
+            
+            # Vérifie si la borne est dans l'ensemble de définition
+            if verifier_ensemble_de_definition(fonction_str, borne):
+                return borne
+            else:
+                print(f"Erreur : La valeur {borne} n'est pas dans l'ensemble de définition de la fonction.")
+        except ValueError:
+            print("Veuillez entrer un nombre valide.")
