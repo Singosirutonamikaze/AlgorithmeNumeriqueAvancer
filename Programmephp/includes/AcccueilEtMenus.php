@@ -5,7 +5,6 @@ function rectangle_bienvenue_complexe()
     // Définir la phrase de bienvenue et la largeur du rectangle
     $phrase = " BIENVENUE ";
     $largeur = strlen($phrase) + 6; // Largeur avec marges supplémentaires pour le cadre
-    $hauteur = 5; // Hauteur du rectangle
 
     // Dessiner la première ligne (double bordure d'étoiles)
     echo str_repeat('*', $largeur) . "\n";

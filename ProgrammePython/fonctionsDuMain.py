@@ -111,24 +111,34 @@ def enregistrer_tableau(methode_choisie, tableau):
     """
     Enregistre le tableau des itérations dans un fichier.
     """
-    fichier = f"{methode_choisie}_tableau.txt"
-    with open(fichier, 'wb') as f:
-        pickle.dump(tableau, f)
-    print(f"Le tableau des itérations a été enregistré dans le fichier {fichier}.")
+    nom_fichier = f"{methode_choisie}_tableau.txt"
+    try:
+        with open(nom_fichier, 'wb') as f:
+            pickle.dump(tableau, f)
+        print(f"Le tableau des itérations a été enregistré dans le fichier {nom_fichier}.")
+    except (FileNotFoundError, PermissionError) as e:
+        print(f"Erreur lors de l'enregistrement du tableau : {e}")
+    except pickle.PickleError as e:
+        print(f"Erreur de sérialisation du tableau : {e}")
 
-    # Demander à l'utilisateur s'il veut afficher la solution à partir du fichier
-    choix_fichier = input(f"Souhaitez-vous afficher la solution enregistrée dans {fichier} ? (oui/non) : ").lower()
-    if choix_fichier == 'oui':
-        if os.path.exists(fichier):
-            with open(fichier, 'rb') as f:
+def afficher_tableau_enregistre(nom_fichier):
+    """
+    Affiche le tableau des itérations à partir d'un fichier.
+    """
+    if os.path.exists(nom_fichier):
+        try:
+            with open(nom_fichier, 'rb') as f:
                 tableau_enregistre = pickle.load(f)
             print(f"Tableau des itérations :")
             for it in tableau_enregistre:
                 print(it)
-        else:
-            print(f"Le fichier {fichier} n'existe pas.")
+        except (FileNotFoundError, PermissionError) as e:
+            print(f"Erreur lors de la lecture du fichier : {e}")
+        except pickle.PickleError as e:
+            print(f"Erreur de désérialisation du tableau : {e}")
     else:
-        print("Aucun fichier n'a été choisi.")
+        print(f"Le fichier {nom_fichier} n'existe pas.")
+
 
 # Fonction pour afficher la racine trouvée
 def afficher_racine(racine):
