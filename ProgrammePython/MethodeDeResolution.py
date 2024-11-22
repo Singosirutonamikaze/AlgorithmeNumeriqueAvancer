@@ -1,25 +1,11 @@
 #Importation des modules necessaires
 import math
-import sys
-from sympy import symbols, sympify, S
-from sympy.calculus.util import continuous_domain
-from sympy.sets.sets import Interval
+from fonctionsTableaux import *
+from sympy import *
+from sympy.calculus.util import *
+from sympy.sets.sets import *
 
-# Fonction pour afficher le tableau stylisé
-def afficher_tableau_dichotomie(tableau):
-    # Affichage de l'entête du tableau avec des bornes d'étoiles
-    print("*" * 100)
-    print(f"{'Iteration':<12}|{'Borne Inférieure':<20}|{'Borne Supérieure':<20}|{'f(Borne Inférieure)':<25}|{'f(Borne Supérieure)':<25}|{'f(borne inferieure) * f(borne superieure)':<25}")
-    print("*" * 100)
-
-    # Affichage des informations ligne par ligne
-    for ligne in tableau:
-        print(f"{ligne['iteration']:<12}{ligne['borne_inferieure']:<20}{ligne['borne_superieure']:<20}{ligne['signe_f(borne_inferieure)']:<25}{ligne['signe_f(borne_superieure)']:<25}{ligne['signe_(f(borne_inferieure)*f(borne_superieure))']:<25}")
-    
-    # Ligne de fermeture avec des étoiles
-    print("*" * 100)
-
-# Fonction pour la méthode de dichotomie avec affichage des intervalles
+# Fonction pour la méthode de la dichotomie avec affichage des intervalles
 def methode_de_dichotomie(fonction, borne_inferieure, borne_superieure, tolerance, nombre_max_iterations):
     tableau_interactions = []
 
@@ -43,7 +29,7 @@ def methode_de_dichotomie(fonction, borne_inferieure, borne_superieure, toleranc
         valeur_borne_superieure = fonction(borne_superieure)
     except Exception as e:
         print(f"Erreur dans l'évaluation de la fonction : {e}")
-        return None, tableau_interactions
+        return None
 
     if math.fabs(valeur_borne_inferieure) <= tolerance:
         return borne_inferieure, tableau_interactions
@@ -53,9 +39,7 @@ def methode_de_dichotomie(fonction, borne_inferieure, borne_superieure, toleranc
     # Si les bornes ne sont pas encadrées, redemander une nouvelle fonction et vérifier
     while not est_encadree(fonction, borne_inferieure, borne_superieure):
         print("Veuillez saisir une nouvelle fonction qui encadre bien la racine.")
-        # Vous pourriez ici appeler une fonction pour que l'utilisateur saisisse une nouvelle fonction valide.
-        # Par exemple, `fonction = saisir_fonction()`, en fonction de votre logique de saisie.
-        return None, tableau_interactions
+        return None
 
     # Calcul du nombre maximum d'itérations nécessaire en théorie
     nombre_iterations = int(math.ceil(math.log(math.fabs(borne_superieure - borne_inferieure) / tolerance) / math.log(2.0)))
@@ -99,25 +83,16 @@ def methode_de_dichotomie(fonction, borne_inferieure, borne_superieure, toleranc
     # Retourne le milieu final si la solution n'a pas été trouvée dans les itérations
     return (borne_inferieure + borne_superieure) * 0.5, tableau_interactions
 
-# Fonction pour la méthode de la sécante
+
+# Fonction pour la méthode de la sécante avec amélioration par dichotomie
 def methode_de_la_secante(fonction, borne_inferieure, borne_superieure, tolerance, nombre_max_iterations):
-    # Évaluation de la fonction aux bornes initiales(Chercher les divers valeur image)
+    tableau_interactions = []
+
+    # Si la racine est bien encadrée, continuer avec la méthode de la sécante
     valeur_borne_inferieure = fonction(borne_inferieure)
     valeur_borne_superieure = fonction(borne_superieure)
 
-    # Vérifie si les bornes sont déjà proches de la racine
-    if math.fabs(valeur_borne_inferieure) <= tolerance:
-        return borne_inferieure
-    if math.fabs(valeur_borne_superieure) <= tolerance:
-        return borne_superieure
-
-    # Vérifie que la racine est bien encadrée entre les bornes
-    if valeur_borne_inferieure * valeur_borne_superieure > 0.0:
-        print(f"La racine n'est pas encadrée entre [{borne_inferieure}, {borne_superieure}].")
-        sys.exit(0)
-
     compteur_iterations = 0
-    # La méthode de la sécante s'applique en itérant jusqu'à ce que la tolérance soit atteinte
     while (math.fabs(borne_superieure - borne_inferieure) > tolerance and compteur_iterations < nombre_max_iterations):
         compteur_iterations += 1
         # Calcul de la nouvelle estimation de la racine
@@ -125,9 +100,20 @@ def methode_de_la_secante(fonction, borne_inferieure, borne_superieure, toleranc
         # Évaluation de la fonction à cette estimation
         valeur_estimation = fonction(estimation)
 
+        # Enregistrement des données dans le tableau des itérations
+        tableau_interactions.append({
+            'iteration': compteur_iterations,
+            'borne_inferieure': borne_inferieure,
+            'borne_superieure': borne_superieure,
+            'estimation': estimation,
+            'f(estimation)': valeur_estimation,
+            'différence_bornes': math.fabs(borne_superieure - borne_inferieure),
+        })
+
         # Si l'estimation est proche de la racine, on retourne cette estimation
         if math.fabs(valeur_estimation) <= tolerance:
-            return estimation
+            print(f"Solution trouvée : x = {estimation} après {compteur_iterations} itérations")
+            return estimation, tableau_interactions
 
         # Mise à jour des bornes en fonction du signe de f(estimation)
         if valeur_estimation * valeur_borne_superieure < 0.0:
@@ -137,8 +123,8 @@ def methode_de_la_secante(fonction, borne_inferieure, borne_superieure, toleranc
             borne_superieure = estimation
             valeur_borne_superieure = valeur_estimation
 
-    # Retourne l'estimation après l'itération
-    return (borne_inferieure - valeur_borne_inferieure * (borne_superieure - borne_inferieure) / (valeur_borne_superieure - valeur_borne_inferieure))
+    print(f"Solution approximative trouvée : x = {borne_inferieure} après {compteur_iterations} itérations")
+    return borne_inferieure, tableau_interactions
 
 # Fonction pour la méthode de Newton-Raphson
 def methode_de_newton_raphson(fonction, derivee_fonction, x_initiale, tolerance, nombre_max_iterations):
@@ -201,45 +187,41 @@ def creer_phi(chaine_phi):
             raise ValueError(f"Erreur inconnue dans la fonction phi(x) : {e}")
 
     return phi
-
-# Fonction pour la méthode du point fixe
 def methode_du_point_fixe(phi, x_initiale, tolerance, nombre_max_iterations):
     compteur_iterations = 0
     x = x_initiale
+    tableau_interactions = []
 
     # La méthode du point fixe itère jusqu'à ce que la différence entre x et phi(x) soit inférieure à la tolérance
     while math.fabs(phi(x) - x) > tolerance and compteur_iterations < nombre_max_iterations:
-        print(f"Iteration {compteur_iterations}: x = {x}, phi(x) = {phi(x)}")
-        x = phi(x)
+        # Calcul de phi(x)
+        phi_x = phi(x)
+        
+        # Enregistrement des informations pour chaque itération
+        tableau_interactions.append({
+            'iteration': compteur_iterations + 1,
+            'x': x,
+            'phi(x)': phi_x,
+            'différence': math.fabs(phi_x - x)
+        })
+        
+        # Affichage des résultats intermédiaires
+        print(f"Iteration {compteur_iterations + 1}: x = {x}, phi(x) = {phi_x}, Différence = {math.fabs(phi_x - x)}")
+        
+        # Mise à jour de x avec la nouvelle valeur de phi(x)
+        x = phi_x
         compteur_iterations += 1
 
     # Vérification de la convergence
     if compteur_iterations == nombre_max_iterations:
         print("Pas de convergence avec la méthode du point fixe.")
-        return None
+        return None, tableau_interactions
     else:
         print(f"Convergence atteinte après {compteur_iterations} itérations : x = {x}")
-        return x
-    
+        return x, tableau_interactions
 
-# Méthode de balayage avec affichage des intervalles
-# Fonction pour afficher le tableau stylisé
-def afficher_tableau_balayage(tableau):
-    # Affichage de l'entête du tableau avec des bornes d'étoiles
-    print("*" * 100)
-    print(f"{'Intervalle':<20}|{'Borne Inférieure':<20}|{'Borne Supérieure':<20}|{'f(Borne Inférieure)':<25}|{'f(Borne Supérieure)':<25}|{'Changement de Signe':<25}")
-    print("*" * 100)
-
-    # Affichage des informations ligne par ligne
-    for ligne in tableau:
-        print(f"{ligne['intervalle']:<20}{ligne['borne_inferieure']:<20}{ligne['borne_superieure']:<20}{ligne['f(borne_inferieure)']:<25}{ligne['f(borne_superieure)']:<25}{ligne['changement_de_signe']:<25}")
-    
-    # Ligne de fermeture avec des étoiles
-    print("*" * 100)
-
-# Méthode de balayage avec tableau des intervalles
 def methode_de_balayage(fonction, borne_inferieure, borne_superieure, pas, tolerance):
-    # Initialisation du tableau
+    # Initialisation du tableau pour stocker les intervalles
     tableau_intervals = []
     variable_x = borne_inferieure
 
@@ -256,6 +238,10 @@ def methode_de_balayage(fonction, borne_inferieure, borne_superieure, pas, toler
         # Vérifie si la fonction change de signe entre les deux bornes
         changement_signe = f_borne_inf * f_borne_sup < 0
 
+        # Affiche l'intervalle en cours et la détection du changement de signe
+        print(f"Intervalle [{borne_inf}, {borne_sup}] : f(borne_inferieure) = {round(f_borne_inf, 6)}, f(borne_superieure) = {round(f_borne_sup, 6)}")
+        print(f"Changement de signe : {'Oui' if changement_signe else 'Non'}")
+
         # Enregistre les informations dans le tableau
         tableau_intervals.append({
             'intervalle': f"[{borne_inf}, {borne_sup}]",
@@ -271,14 +257,12 @@ def methode_de_balayage(fonction, borne_inferieure, borne_superieure, pas, toler
             print(f"Changement de signe détecté dans l'intervalle [{borne_inf}, {borne_sup}]")
             racine, _ = methode_de_dichotomie(fonction, borne_inf, borne_sup, tolerance, 100)
             print(f"Racine trouvée : {racine}")
-            afficher_tableau_balayage(tableau_intervals)  # Affiche le tableau final
-            return racine
+            return racine, tableau_intervals
         
         # Passe à l'intervalle suivant
         variable_x += pas
 
     print("Aucune racine trouvée dans l'intervalle donné.")
-    afficher_tableau_balayage(tableau_intervals)  # Affiche le tableau même si aucune racine n'est trouvée
     return None
 
 

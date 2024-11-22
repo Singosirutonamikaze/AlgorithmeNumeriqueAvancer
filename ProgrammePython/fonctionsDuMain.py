@@ -1,15 +1,10 @@
 # Importation des modules nécessaires
-from sympy import symbols, sympify, lambdify  # Importation de sympy pour manipuler des expressions mathématiques symboliques
-from MethodeDeResolution import (
-    methode_de_dichotomie, methode_de_la_secante, methode_de_newton_raphson, ensemble_de_definition,
-    methode_du_point_fixe, methode_de_balayage, creer_phi, afficher_tableau_dichotomie
-)  # Importation des différentes méthodes de résolution
-from AccueilEtMenus import (
-    methode_resolution, saisir_fonction, saisir_tolerance_et_iterations, demander_bornes
-)  # Importation des fonctions liées aux menus et saisies
-
-# Définir le symbole 'x' pour les fonctions mathématiques
-x = symbols('x')
+from sympy import *  # Importation de sympy pour manipuler des expressions mathématiques symboliques
+from MethodeDeResolution import *  # Importation des différentes méthodes de résolution
+from AccueilEtMenus import *  # Importation des fonctions liées aux menus et saisies
+from fonctionsTableaux import *
+import pickle
+import os
 
 # Fonction pour choisir la méthode de résolution
 def choisir_methode():
@@ -70,40 +65,70 @@ def appliquer_methode(choix, fonction, fonction_expr, borne_inferieure, borne_su
     Applique la méthode choisie pour résoudre l'équation.
     """
     racine = None  # Initialiser la variable racine
+    tableau = None  # Initialiser la variable tableau
 
     # Appliquer la méthode choisie selon le numéro de méthode (choix)
-    if choix == 1:
-        # Méthode de dichotomie
-        racine, tableau = methode_de_dichotomie(fonction, borne_inferieure, borne_superieure, tolerance, nombre_max_iterations)
-        afficher_tableau_dichotomie(tableau)  # Afficher le tableau des itérations de la méthode de dichotomie
-    elif choix == 2:
-        # Méthode de la sécante
-        racine = methode_de_la_secante(fonction, borne_inferieure, borne_superieure, tolerance, nombre_max_iterations)
-    elif choix == 3:
-        # Méthode de Newton-Raphson
-        # Calcul de la dérivée de la fonction
-        derivee_fonction = lambdify(x, fonction_expr.diff(x), 'math')
-        # Demander une estimation initiale
-        x_initiale = float(input("Entrez une estimation initiale de la racine (exemple: 2) : Xo = "))
-        racine = methode_de_newton_raphson(fonction, derivee_fonction, x_initiale, tolerance, nombre_max_iterations)
-    elif choix == 4:
-        # Méthode du point fixe
-        while True:
-            try:
-                # Demander à l'utilisateur de saisir la fonction phi(x) pour la méthode du point fixe
-                chaine_phi = input("Entrez la fonction phi(x) (exemple : sqrt(2*x - 1)) : ")
-                phi = creer_phi(chaine_phi)  # Créer la fonction phi
-                x_initiale = float(input("Entrez une estimation initiale de la racine (exemple: 2) : Xo = "))
-                racine = methode_du_point_fixe(phi, x_initiale, tolerance, nombre_max_iterations)
-                break  # Sortir de la boucle une fois la méthode réussie
-            except ValueError as e:
-                print(f"Erreur : {e}. Veuillez réessayer.")  # Gestion d'erreur si la saisie est incorrecte
-    elif choix == 5:
-        # Méthode de balayage
-        pas = float(input("Entrez le pas pour le balayage (exemple: 0.1) : "))
-        racine = methode_de_balayage(fonction, borne_inferieure, borne_superieure, pas, tolerance)
+    try:
+        if choix == 1:
+            racine, tableau = methode_de_dichotomie(fonction, borne_inferieure, borne_superieure, tolerance, nombre_max_iterations)
+        elif choix == 2:
+            racine, tableau = methode_de_la_secante(fonction, borne_inferieure, borne_superieure, tolerance, nombre_max_iterations)
+        elif choix == 3:
+            derivee_fonction = lambdify(x, fonction_expr.diff(x), 'math')
+            x_initiale = float(input("Entrez une estimation initiale de la racine (exemple: 2) : Xo = "))
+            racine = methode_de_newton_raphson(fonction, derivee_fonction, x_initiale, tolerance, nombre_max_iterations)
+        elif choix == 4:
+            phi_str = input("Entrez l'expression de phi(x) (exemple : sqrt(2*x - 1)) : ")
+            phi = creer_phi(phi_str)
+            x_initiale = float(input("Entrez une estimation initiale de la racine (exemple: 2) : Xo = "))
+            racine, tableau = methode_du_point_fixe(phi, x_initiale, tolerance, nombre_max_iterations)
+        elif choix == 5:
+            pas = float(input("Entrez le pas pour le balayage (exemple: 0.1) : "))
+            racine, tableau = methode_de_balayage(fonction, borne_inferieure, borne_superieure, pas, tolerance)
+
+        if tableau is not None:
+            afficher_tableau(choix, tableau)
+            enregistrer_tableau(choix, tableau)
+    except ValueError as e:
+        print(f"Erreur : {e}. Veuillez réessayer.")  # Gestion d'erreur si la saisie est incorrecte
 
     return racine  # Retourner la racine trouvée par la méthode
+
+def afficher_tableau(choix, tableau):
+    """
+    Affiche le tableau des itérations en fonction de la méthode choisie.
+    """
+    if choix == 1:
+        afficher_tableau_dichotomie(tableau)
+    elif choix == 2:
+        afficher_tableau_secante(tableau)
+    elif choix == 4:
+        afficher_tableau_point_fixe(tableau)
+    elif choix == 5:
+        afficher_tableau_balayage(tableau)
+
+def enregistrer_tableau(methode_choisie, tableau):
+    """
+    Enregistre le tableau des itérations dans un fichier.
+    """
+    fichier = f"{methode_choisie}_tableau.txt"
+    with open(fichier, 'wb') as f:
+        pickle.dump(tableau, f)
+    print(f"Le tableau des itérations a été enregistré dans le fichier {fichier}.")
+
+    # Demander à l'utilisateur s'il veut afficher la solution à partir du fichier
+    choix_fichier = input(f"Souhaitez-vous afficher la solution enregistrée dans {fichier} ? (oui/non) : ").lower()
+    if choix_fichier == 'oui':
+        if os.path.exists(fichier):
+            with open(fichier, 'rb') as f:
+                tableau_enregistre = pickle.load(f)
+            print(f"Tableau des itérations :")
+            for it in tableau_enregistre:
+                print(it)
+        else:
+            print(f"Le fichier {fichier} n'existe pas.")
+    else:
+        print("Aucun fichier n'a été choisi.")
 
 # Fonction pour afficher la racine trouvée
 def afficher_racine(racine):
