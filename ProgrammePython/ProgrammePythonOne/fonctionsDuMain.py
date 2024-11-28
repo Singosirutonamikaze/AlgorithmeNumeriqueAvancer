@@ -24,6 +24,7 @@ def choisir_methode():
         except ValueError:
             print("Erreur : veuillez entrer un nombre entier.\n")
 
+
 # Fonction pour saisir la fonction et afficher son ensemble de définition
 def saisir_fonction_et_ensemble_definition():
     """
@@ -42,6 +43,7 @@ def saisir_fonction_et_ensemble_definition():
         print(f"Erreur lors de l'interprétation de la fonction : {e}")
         return None, None  # Retourner None si une erreur se produit
 
+
 # Fonction pour saisir les bornes nécessaires selon la méthode choisie
 def saisir_bornes_si_necessaire(choix, fonction_str):
     """
@@ -51,6 +53,8 @@ def saisir_bornes_si_necessaire(choix, fonction_str):
     if choix in [1, 2, 5]:
         return demander_bornes(fonction_str)  # Appel à la fonction demander_bornes pour obtenir les bornes
     return None, None  # Retourner None si les bornes ne sont pas nécessaires pour cette méthode
+
+
 
 # Fonction pour saisir la tolérance et le nombre d'itérations
 def saisir_tolerance_et_iterations_de_resolution():

@@ -152,9 +152,10 @@ def methode_de_newton_raphson(fonction, derivee_fonction, x_initiale, tolerance,
         print("Pas de convergence avec la méthode de Newton.")
         return None
     else:
+        print(f"Convergence atteinte après {compteur_iterations} itérations.")
         return x
-
-
+    
+    
 # Générateur sécurisé de fonction phi(x)
 def creer_phi(chaine_phi):
     # Vérification de base : la chaîne ne doit pas être vide
@@ -175,7 +176,6 @@ def creer_phi(chaine_phi):
 
     # Fonction phi dynamique
     def phi(x):
-        
         try:
             # Évalue la chaîne avec les fonctions autorisées
             return eval(chaine_phi, {"__builtins__": None}, {**fonctions_autorisees, "x": x})
@@ -187,38 +187,47 @@ def creer_phi(chaine_phi):
             raise ValueError(f"Erreur inconnue dans la fonction phi(x) : {e}")
 
     return phi
+
+# Méthode du point fixe avec gestion des erreurs améliorée
 def methode_du_point_fixe(phi, x_initiale, tolerance, nombre_max_iterations):
     compteur_iterations = 0
     x = x_initiale
     tableau_interactions = []
 
     # La méthode du point fixe itère jusqu'à ce que la différence entre x et phi(x) soit inférieure à la tolérance
-    while math.fabs(phi(x) - x) > tolerance and compteur_iterations < nombre_max_iterations:
+    while True:
         # Calcul de phi(x)
-        phi_x = phi(x)
+        try:
+            phi_x = phi(x)
+        except Exception as e:
+            print(f"Erreur lors du calcul de phi(x) avec x = {x}: {e}")
+            return None, tableau_interactions
         
-        # Enregistrement des informations pour chaque itération
+        # Vérification de la convergence
+        difference = math.fabs(phi_x - x)
         tableau_interactions.append({
             'iteration': compteur_iterations + 1,
             'x': x,
             'phi(x)': phi_x,
-            'différence': math.fabs(phi_x - x)
+            'différence': difference
         })
-        
+
         # Affichage des résultats intermédiaires
-        print(f"Iteration {compteur_iterations + 1}: x = {x}, phi(x) = {phi_x}, Différence = {math.fabs(phi_x - x)}")
+        print(f"Iteration {compteur_iterations + 1}: x = {x}, phi(x) = {phi_x}, Différence = {difference}")
+        
+        # Vérification de la convergence
+        if difference <= tolerance:
+            print(f"Convergence atteinte après {compteur_iterations + 1} itérations : x = {x}")
+            return x, tableau_interactions
         
         # Mise à jour de x avec la nouvelle valeur de phi(x)
         x = phi_x
         compteur_iterations += 1
 
-    # Vérification de la convergence
-    if compteur_iterations == nombre_max_iterations:
-        print("Pas de convergence avec la méthode du point fixe.")
-        return None, tableau_interactions
-    else:
-        print(f"Convergence atteinte après {compteur_iterations} itérations : x = {x}")
-        return x, tableau_interactions
+        # Si le nombre d'itérations atteint le maximum sans convergence, on arrête
+        if compteur_iterations >= nombre_max_iterations:
+            print("Pas de convergence avec la méthode du point fixe.")
+            return None, tableau_interactions
 
 def methode_de_balayage(fonction, borne_inferieure, borne_superieure, pas, tolerance):
     # Initialisation du tableau pour stocker les intervalles
