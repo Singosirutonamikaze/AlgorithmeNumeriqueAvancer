@@ -1,8 +1,8 @@
 # Importation des modules nécessaires
-from sympy import *  # Importation de sympy pour manipuler des expressions mathématiques symboliques
-from MethodeDeResolution import *  # Importation des différentes méthodes de résolution
-from AccueilEtMenus import *  # Importation des fonctions liées aux menus et saisies
-from fonctionsTableaux import *
+from sympy import lambdify, sympify, symbols  # Importation de sympy pour manipuler des expressions mathématiques symboliques
+from MethodeDeResolution import methode_de_balayage, methode_de_la_secante, methode_de_dichotomie, methode_de_newton_raphson, methode_du_point_fixe, ensemble_de_definition, creer_phi  # Importation des différentes méthodes de résolution
+from AccueilEtMenus import   methode_resolution, saisir_fonction, saisir_tolerance_et_iterations, demander_bornes # Importation des fonctions liées aux menus et saisies
+from fonctionsTableaux import afficher_tableau_balayage, afficher_tableau_secante, afficher_tableau_dichotomie, afficher_tableau_point_fixe
 import pickle
 import os
 
@@ -24,7 +24,7 @@ def choisir_methode():
         except ValueError:
             print("Erreur : veuillez entrer un nombre entier.\n")
 
-
+x = symbols('x')
 # Fonction pour saisir la fonction et afficher son ensemble de définition
 def saisir_fonction_et_ensemble_definition():
     """

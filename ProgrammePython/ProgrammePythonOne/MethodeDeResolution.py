@@ -1,9 +1,8 @@
 #Importation des modules necessaires
 import math
-from fonctionsTableaux import *
-from sympy import *
-from sympy.calculus.util import *
-from sympy.sets.sets import *
+from sympy import Interval, symbols,sympify
+from sympy.calculus.util import continuous_domain
+from sympy.sets.sets import S
 
 # Fonction pour la méthode de la dichotomie avec affichage des intervalles
 def methode_de_dichotomie(fonction, borne_inferieure, borne_superieure, tolerance, nombre_max_iterations):

@@ -1,5 +1,5 @@
-from fonctionsDuMain import *  # Importation des fonctions principales du programme, comme choisir_methode, saisir_fonction, appliquer_methode, etc.
-from AccueilEtMenus import *  # Importation de la fonction pour afficher l'écran de bienvenue
+from fonctionsDuMain import choisir_methode,saisir_tolerance_et_iterations_de_resolution  # Importation des fonctions principales du programme, comme choisir_methode, saisir_fonction, appliquer_methode, etc.
+from AccueilEtMenus import  rectangle_bienvenue_complexe, choisir_methode, print_method_name, saisir_fonction_et_ensemble_definition, saisir_bornes_si_necessaire, appliquer_methode, afficher_racine, demander_recommencer # Importation de la fonction pour afficher l'écran de bienvenue
 
 def main():
     # Fonction principale qui gère le programme.

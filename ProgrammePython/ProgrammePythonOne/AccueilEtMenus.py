@@ -122,12 +122,12 @@ def verifier_ensemble_de_definition(fonction, borne):
             print(f"Erreur : Logarithme non défini pour x = {borne}. La borne doit être strictement positive (NB: la fonction log(x) est définie pour x > 0 et x != 0).\n ")
             return False
 
-        # Vérification des racines carrées (si la fonction en contient)
-        if 'sqrt' in str(fonction):
-            expr_sqrt = fonction.subs(x, borne)
-            if expr_sqrt < 0:
-                print(f"Erreur : L'expression sous la racine carrée est négative pour x = {borne}.")
-                return False
+        # # Vérification des racines carrées (si la fonction en contient)
+        # if 'sqrt' in str(fonction):
+        #     expr_sqrt = fonction.subs(x, borne)
+        #     if expr_sqrt < 0:
+        #         print(f"Erreur : L'expression sous la racine carrée est négative pour x = {borne}.")
+        #         return False
 
         # Vérification des dénominateurs pour les fonctions rationnelles
         if '/' in str(fonction):
