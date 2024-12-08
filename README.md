@@ -142,3 +142,71 @@ Les contributions sont les bienvenues! Si vous avez des améliorations ou des su
 ## Licence
 
 Ce projet est sous licence MIT - voir le fichier [LICENSE](LICENSE) pour plus de détails.
+
+# Résolution de systèmes linéaires par factorisation LU avec pivot
+
+## Introduction
+
+Ce module Python implémente la factorisation LU avec pivot partiel pour résoudre des systèmes d'équations linéaires de la forme `AX = B`. Il fournit également des fonctions pour résoudre des systèmes triangulaires inférieurs et supérieurs.
+
+## Installation
+
+Pour utiliser ce module, assurez-vous d'avoir installé NumPy :
+
+```bash
+pip install numpy
+```
+
+## Utilisation
+
+```python
+import numpy as np
+from lu_solver import resoudre_systeme_avec_lu, saisir_matrice_et_vecteur
+
+# Saisie de la matrice A et du vecteur B
+A, B = saisir_matrice_et_vecteur()
+
+# Résolution du système
+solution = resoudre_systeme_avec_lu(A, B)
+
+# Affichage de la solution
+print("Solution du système AX = B :")
+print(solution)
+```
+
+## Fonctionnalités
+
+* **Factorisation LU avec pivot partiel:** Décompose une matrice carrée en un produit de matrices triangulaires inférieure et supérieure, en utilisant un pivot partiel pour améliorer la stabilité numérique.
+* **Résolution de systèmes triangulaires:** Résout efficacement des systèmes linéaires avec des matrices triangulaires inférieures ou supérieures.
+* **Résolution de systèmes généraux:** Combine la factorisation LU et la résolution de systèmes triangulaires pour résoudre des systèmes linéaires généraux.
+* **Interface utilisateur:** Permet à l'utilisateur de saisir la matrice et le vecteur de manière interactive.
+* **Gestion des erreurs:** Vérifie la validité des entrées et lève des exceptions en cas d'erreur (matrice singulière, dimensions incompatibles).
+
+## Structure du code
+
+Le code est organisé en plusieurs fonctions :
+
+* `factorisation_lu_avec_pivot`: Effectue la factorisation LU avec pivot.
+* `resoudre_triangulaire_inferieure`: Résout un système triangulaire inférieur.
+* `resoudre_triangulaire_superieure`: Résout un système triangulaire supérieur.
+* `resoudre_systeme_avec_lu`: Résout un système linéaire général en utilisant la factorisation LU.
+* `saisir_matrice_et_vecteur`: Permet à l'utilisateur de saisir la matrice et le vecteur.
+
+## Améliorations futures
+
+* **Tests unitaires:** Implémentation de tests unitaires pour vérifier la correction du code.
+* **Optimisations:** Recherche d'optimisations possibles pour améliorer les performances.
+* **Documentation:** Élargissement de la documentation pour couvrir tous les aspects du code.
+* **Généralisations:** Extension à des matrices rectangulaires ou à d'autres types de factorisations (Cholesky, QR).
+
+## Contributions
+
+Les contributions à ce projet sont les bienvenues. N'hésitez pas à créer des issues ou à soumettre des pull requests.
+
+**Note:** 
+* **Tests unitaires:** Il est fortement recommandé d'ajouter des tests unitaires pour vérifier le bon fonctionnement de chaque fonction.
+* **Optimisations:** Vous pouvez explorer des optimisations telles que l'utilisation de fonctions vectorisées de NumPy ou l'algorithme de résolution de systèmes triangulaires de Crout.
+* **Documentation:** Une documentation claire et détaillée est essentielle pour faciliter l'utilisation et la maintenance du code.
+
+En suivant ces recommandations, vous pouvez améliorer encore davantage ce module de résolution de systèmes linéaires.
+
