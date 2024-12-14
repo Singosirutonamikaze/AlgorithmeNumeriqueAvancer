@@ -33,7 +33,7 @@ public class InscriptionUE {
         return uniteEnseignement;
     }   
     
-    public void InscriptionUE(Etudiant _etudiant, UniteEnseignement _uniteEnseignement, float _moyenne) {
+    public void Inscription(Etudiant _etudiant, UniteEnseignement _uniteEnseignement, float _moyenne) {
         if (moyenne >= 0 && moyenne <= 20) {
             this.etudiant = _etudiant;
             this.uniteEnseignement = _uniteEnseignement;
