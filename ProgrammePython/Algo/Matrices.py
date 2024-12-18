@@ -100,7 +100,7 @@ def plot_results(sizes, naive_times, strassen_times):
 
 # Main
 if __name__ == "__main__":
-    max_matrix_size = 512  # Taille maximale des matrices
-    step_size = 32  # Incrémente de 32 à chaque étape
+    max_matrix_size = 256  # Taille maximale des matrices
+    step_size = 16  # Incrémente de 32 à chaque étape
     sizes, naive_times, strassen_times = compare_matrix_multiplication(max_matrix_size, step_size)
     plot_results(sizes, naive_times, strassen_times)
